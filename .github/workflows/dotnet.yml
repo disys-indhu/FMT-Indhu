@@ -15,13 +15,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Verify Project File
-        run: |
-          if (-not (Test-Path "Test_Functions\Test_Functions.csproj")) {
-            echo "Project file not found!"
-            exit 1
-          }
-
+        
       - name: Azure Login
         uses: azure/login@v1
         with:
@@ -29,6 +23,7 @@ jobs:
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
+        
       - name: Restore NuGet Packages
         run: nuget restore Test_Functions/Test_Functions.csproj
 
@@ -37,7 +32,7 @@ jobs:
           msbuild.exe Test_Functions\Test_Functions.csproj /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="17.0" /p:OutDir="./output"
 
       - name: Deploy
-        uses: azure/webapps-deploy@v2
+        uses: azure/functions-deploy@v2
         with:
           app-name: 'FunctioAppDeploymentTry'
           slot-name: 'production'
