@@ -56,7 +56,7 @@ jobs:
       - name: Restore NuGet Packages
         run: nuget restore Test_WebApp/Test_WebApp.csproj
 
-      - name: Build Function App
+      - name: Build Web App
         run: |
           msbuild.exe Test_WebApp/Test_WebApp.csproj /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="17.0" /p:OutDir="./outputs"
 
