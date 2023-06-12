@@ -1,28 +1,32 @@
-name: .NET
+name: Deploy Function App
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        
+
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
-      - name: Deploy Function App
-        uses: azure/functions-action@v1
+
+      - run: az account list --output table
+      - run: az account set --subscription 23dedca3-2d6f-4822-a69c-d354f6f9e298
+
+      - name: Deploy
+        uses: azure/webapps-deploy@v2
         with:
          app-name: 'FunctioAppDeploymentTry'
          slot-name: 'production'
-         package: ./Test_Functions
+         package: .
+        
+
+            
