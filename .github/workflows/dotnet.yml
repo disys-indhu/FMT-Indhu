@@ -3,24 +3,39 @@ name: Deploy Function App
 on:
   push:
     branches:
-      - main
+      - master
+
+env:
+  PACKAGE_PATH: ./Test_Functions
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Verify Project File
+        run: |
+          if (-not (Test-Path "Test_Functions\Test_Functions.csproj")) {
+            echo "Project file not found!"
+            exit 1
+          }
 
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
+      
+
+      - name: Build
+        run: |
+          msbuild.exe Test_Functions\Test_Functions.csproj /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="17.0" /p:OutDir="./output"
+
       - name: Deploy
-        uses: Azure/functions-action@v1
+        uses: azure/webapps-deploy@v2
         with:
           app-name: 'FunctioAppDeploymentTry'
           slot-name: 'production'
-          package: ./Test_Functions
+          package: ${{ env.PACKAGE_PATH }}/output
