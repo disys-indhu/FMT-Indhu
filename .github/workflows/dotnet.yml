@@ -32,7 +32,7 @@ jobs:
           msbuild.exe Test_Functions\Test_Functions.csproj /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="17.0" /p:OutDir="./output"
 
       - name: Deploy
-        uses: azure/functions-deploy@v2
+        uses: azure/functions-deploy@v1
         with:
           app-name: 'FunctioAppDeploymentTry'
           slot-name: 'production'
