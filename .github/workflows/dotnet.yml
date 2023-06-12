@@ -19,7 +19,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           
       - name: Deploy
-        uses: azure/functions-deploy@v2
+        uses: Azure/functions-action@v1.3.1
         with:
           app-name: 'FunctioAppDeploymentTry'
           slot-name: 'production'
