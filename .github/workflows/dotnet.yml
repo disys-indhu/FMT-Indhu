@@ -27,7 +27,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
 
       - name: Build
         run: |
