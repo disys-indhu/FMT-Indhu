@@ -3,7 +3,7 @@ name: Deploy Function App
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   PACKAGE_PATH: ./Test_Functions
