@@ -39,6 +39,7 @@ jobs:
           package: ${{ env.PACKAGE_PATH }}/output
 
   deploy-web-app:
+    needs: deploy-function-app
     runs-on: windows-latest
 
     steps:
