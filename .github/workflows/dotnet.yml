@@ -17,16 +17,12 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - run: az account list --output table
-      - run: az account set --subscription 23dedca3-2d6f-4822-a69c-d354f6f9e298
-
       - name: Deploy
         uses: azure/webapps-deploy@v2
         with:
          app-name: 'FunctioAppDeploymentTry'
          slot-name: 'production'
-         package: .
+         package: ./Test_Functions
         
 
             
