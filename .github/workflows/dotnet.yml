@@ -1,4 +1,4 @@
-name: Deploy Web App
+name: Deploy Function App and Web App
 
 on:
   push:
@@ -6,9 +6,38 @@ on:
       - main
 
 env:
+  PACKAGE_PATH: ./Test_Functions
   WEB_PATH: ./Test_WebApp
 
 jobs:
+  deploy-function-app:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Restore NuGet Packages
+        run: nuget restore Test_Functions/Test_Functions.csproj
+
+      - name: Build Function App
+        run: |
+          msbuild.exe Test_Functions/Test_Functions.csproj /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="17.0" /p:OutDir="./output"
+
+      - name: Deploy Function App
+        uses: azure/functions-action@v1
+        with:
+          app-name: 'FunctioAppDeploymentTry'
+          package: ${{ env.PACKAGE_PATH }}/output
+
   deploy-web-app:
     runs-on: ubuntu-latest
 
@@ -21,23 +50,18 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
 
-      - name: Install npm packages
-        run: |
-          cd Test_WebApp
-          npm install
+      - name: Restore NuGet Packages
+        run: nuget restore Test_WebApp/Test_WebApp.csproj
 
-      - name: Build Web App
+      - name: Build Function App
         run: |
-          cd Test_WebApp
-          npm run build
+          msbuild.exe Test_WebApp/Test_WebApp.csproj /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="17.0" /p:OutDir="./outputs"
 
       - name: Deploy Web App
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-action@v1
         with:
-          app-name: 'WebAppDeploymentTry'
-          package: ${{ env.WEB_PATH }}/dist
+          app-name: 'DeploymentWebAppTry'
+          package: ${{ env.WEB_PATH }}/outputs
