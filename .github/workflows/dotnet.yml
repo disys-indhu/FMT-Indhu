@@ -28,5 +28,9 @@ jobs:
       - name: Build Web App
         run: |
           msbuild.exe Test_db/Test_db.sqlproj /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="17.0" /p:OutDir="./outputs"
+         
+      - name: List Installed DLLs
+        run: |
+          dir ./outputs/*.dll
 
      
