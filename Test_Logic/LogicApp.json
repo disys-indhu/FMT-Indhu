@@ -7,7 +7,7 @@
       "minLength": 1,
       "maxLength": 80,
       "metadata": {
-        "description": "Name of the Logic App."
+        "description": "DeployLogicAppUsingGit"
       }
     },
     "logicAppLocation": {
@@ -34,30 +34,127 @@
       "metadata": {
         "description": "Location of the Logic App."
       }
+    },
+    "workflows_FMTLogicApp_name": {
+      "defaultValue": "DeployLogicAppUsingGit",
+      "type": "String"
     }
   },
   "variables": {},
   "resources": [
     {
-      "name": "[parameters('logicAppName')]",
       "type": "Microsoft.Logic/workflows",
-      "location": "[parameters('logicAppLocation')]",
-      "tags": {
-        "displayName": "LogicApp"
-      },
-      "apiVersion": "2016-06-01",
+      "apiVersion": "2017-07-01",
+      "name": "[parameters('workflows_FMTLogicApp_name')]",
+      "location": "centralus",
       "properties": {
+        "state": "Enabled",
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
           "contentVersion": "1.0.0.0",
-          "actions": {},
-          "outputs": {},
           "parameters": {},
-          "triggers": {}
+          "triggers": {
+            "manual": {
+              "type": "Request",
+              "kind": "Http",
+              "inputs": {}
+            }
+          },
+          "actions": {
+            "Create_HTML_table": {
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Table",
+              "inputs": {
+                "format": "HTML",
+                "from": "@body('Parse_JSON')?['data']"
+              }
+            },
+            "HTTP": {
+              "runAfter": {},
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://reqres.in/api/users?page=2"
+              }
+            },
+            "Parse_JSON": {
+              "runAfter": {
+                "HTTP": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('HTTP')",
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "properties": {
+                          "avatar": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "first_name": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "integer"
+                          },
+                          "last_name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "email",
+                          "first_name",
+                          "last_name",
+                          "avatar"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "per_page": {
+                      "type": "integer"
+                    },
+                    "support": {
+                      "properties": {
+                        "text": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "total_pages": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "outputs": {}
         },
         "parameters": {}
       }
     }
-  ],
-  "outputs": {}
+  ]
 }
