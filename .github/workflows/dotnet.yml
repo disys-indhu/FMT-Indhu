@@ -31,6 +31,6 @@ jobs:
          
       - name: List Installed DLLs
         run: |
-          dir ./outputs/*.dll
+          dir $(Agent.BuildDirectory)\outputs\*.dll
 
      
